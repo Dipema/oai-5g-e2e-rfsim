@@ -245,7 +245,7 @@ node0 = request.RawPC( "node0" )
 node0.hardware_type = "d430"
 node0.component_manager_id = COMP_MANAGER_ID
 node0.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
-node0_if = cn_node.addInterface("node0-if")
+node0_if = node0.addInterface("node0-if")
 node0_if.addAddress(rspec.IPv4Address("192.168.1.1", "255.255.255.0"))
 node0_link = request.Link("node0-link")
 node0_link.bandwidth = 10*1000*1000
@@ -257,7 +257,7 @@ node1.hardware_type = "d430"
 node1.component_manager_id = COMP_MANAGER_ID
 node1.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
 
-node1_node0_if = nodeb.addInterface("node1-node0-if")
+node1_node0_if = node1.addInterface("node1-node0-if")
 node1_node0_if.addAddress(rspec.IPv4Address("192.168.1.2", "255.255.255.0"))
 node0_link.addInterface(node1_node0_if)
 
