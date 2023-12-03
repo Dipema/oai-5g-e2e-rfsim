@@ -200,11 +200,66 @@ import geni.urn as URN
 import geni.rspec.igext as IG
 import geni.rspec.emulab.pnext as PN
 
-request = portal.context.makeRequestRSpec()
+BIN_PATH = "/local/repository/bin"
+ETC_PATH = "/local/repository/etc"
+COMP_MANAGER_ID = "urn:publicid:IDN+emulab.net+authority+cm"
+DEFAULT_NR_RAN_HASH = "1268b27c91be3a568dd352f2e9a21b3963c97432" # 2023.wk19
+DEFAULT_NR_CN_HASH = "v1.5.0"
 
-node = request.RawPC( "node" )
-node.hardware_type = "d430"
-node.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
+pc = portal.Context()
+
+node_types = [
+    ("d430", "Emulab, d430"),
+    ("d740", "Emulab, d740"),
+]
+
+pc.defineParameter(
+    name="sdr_nodetype",
+    description="Type of compute node paired with the SDRs",
+    typ=portal.ParameterType.STRING,
+    defaultValue=node_types[1],
+    legalValues=node_types
+)
+
+pc.defineParameter(
+    name="cn_nodetype",
+    description="Type of compute node to use for CN node (if included)",
+    typ=portal.ParameterType.STRING,
+    defaultValue=node_types[0],
+    legalValues=node_types
+)
+
+pc.defineParameter(
+    name="sdr_compute_image",
+    description="Image to use for compute connected to SDRs",
+    typ=portal.ParameterType.STRING,
+    defaultValue="",
+    advanced=True
+)
+
+params = pc.bindParameters()
+request = pc.makeRequestRSpec()
+
+#Core Network, gNodeB and UE1
+node0 = request.RawPC( "node0" )
+node0.hardware_type = "d430"
+node0.component_manager_id = COMP_MANAGER_ID
+node0.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
+node0_if = cn_node.addInterface("node0-if")
+node0_if.addAddress(rspec.IPv4Address("192.168.1.1", "255.255.255.0"))
+node0_link = request.Link("node0-link")
+node0_link.bandwidth = 10*1000*1000
+node0_link.addInterface(node0_if)
+
+#UE2
+node1 = request.RawPC( "node1" )
+node1.hardware_type = "d430"
+node1.component_manager_id = COMP_MANAGER_ID
+node1.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
+
+node1_node0_if = nodeb.addInterface("node1-node0-if")
+node1_node0_if.addAddress(rspec.IPv4Address("192.168.1.2", "255.255.255.0"))
+node0_link.addInterface(node1_node0_if)
 
 tour = IG.Tour()
 tour.Description(IG.Tour.MARKDOWN, tourDescription)
