@@ -208,40 +208,40 @@ DEFAULT_NR_CN_HASH = "v1.5.0"
 
 pc = portal.Context()
 
-node_types = [
-    ("d430", "Emulab, d430"),
-    ("d740", "Emulab, d740"),
-]
+#node_types = [
+#    ("d430", "Emulab, d430"),
+#    ("d740", "Emulab, d740"),
+#]
 
-pc.defineParameter(
-    name="sdr_nodetype",
-    description="Type of compute node paired with the SDRs",
-    typ=portal.ParameterType.STRING,
-    defaultValue=node_types[1],
-    legalValues=node_types
-)
+#pc.defineParameter(
+#    name="sdr_nodetype",
+#    description="Type of compute node paired with the SDRs",
+#    typ=portal.ParameterType.STRING,
+#    defaultValue=node_types[1],
+#    legalValues=node_types
+#)
 
-pc.defineParameter(
-    name="cn_nodetype",
-    description="Type of compute node to use for CN node (if included)",
-    typ=portal.ParameterType.STRING,
-    defaultValue=node_types[0],
-    legalValues=node_types
-)
+#pc.defineParameter(
+#    name="cn_nodetype",
+#    typ=portal.ParameterType.STRING,
+#    description="Type of compute node to use for CN node (if included)",
+#    defaultValue=node_types[0],
+#    legalValues=node_types
+#)
 
-pc.defineParameter(
-    name="sdr_compute_image",
-    description="Image to use for compute connected to SDRs",
-    typ=portal.ParameterType.STRING,
-    defaultValue="",
-    advanced=True
-)
+#pc.defineParameter(
+#    name="sdr_compute_image",
+#    description="Image to use for compute connected to SDRs",
+#    typ=portal.ParameterType.STRING,
+#    defaultValue="",
+#    advanced=True
+#)
 
 params = pc.bindParameters()
 request = pc.makeRequestRSpec()
 
-#Core Network, gNodeB and UE1
-node0 = request.RawPC( "node0" )
+#Core Network and gNodeB
+node0 = request.RawPC( "cn-gNodeb" )
 node0.hardware_type = "d430"
 node0.component_manager_id = COMP_MANAGER_ID
 node0.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
@@ -251,8 +251,8 @@ node0_link = request.Link("node0-link")
 node0_link.bandwidth = 10*1000*1000
 node0_link.addInterface(node0_if)
 
-#UE2
-node1 = request.RawPC( "node1" )
+#UE1
+node1 = request.RawPC( "UE1" )
 node1.hardware_type = "d430"
 node1.component_manager_id = COMP_MANAGER_ID
 node1.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
@@ -260,6 +260,16 @@ node1.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-doc
 node1_node0_if = node1.addInterface("node1-node0-if")
 node1_node0_if.addAddress(rspec.IPv4Address("192.168.1.2", "255.255.255.0"))
 node0_link.addInterface(node1_node0_if)
+
+#UE2
+node2 = request.RawPC( "UE2" )
+node2.hardware_type = "d430"
+node2.component_manager_id = COMP_MANAGER_ID
+node2.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
+
+node2_node0_if = node1.addInterface("node2-node0-if")
+node2_node0_if.addAddress(rspec.IPv4Address("192.168.1.3", "255.255.255.0"))
+node0_link.addInterface(node2_node0_if)
 
 tour = IG.Tour()
 tour.Description(IG.Tour.MARKDOWN, tourDescription)
