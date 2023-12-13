@@ -267,7 +267,7 @@ node2.hardware_type = "d430"
 node2.component_manager_id = COMP_MANAGER_ID
 node2.disk_image = "urn:publicid:IDN+emulab.net+image+OAI2021FallWS:oai-cn5g-docker"
 
-node2_node0_if = node1.addInterface("node2-node0-if")
+node2_node0_if = node2.addInterface("node2-node0-if")
 node2_node0_if.addAddress(rspec.IPv4Address("192.168.1.3", "255.255.255.0"))
 node0_link.addInterface(node2_node0_if)
 
